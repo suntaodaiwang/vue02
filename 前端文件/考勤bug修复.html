@@ -1,17 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-
-
 <xform:editShow>
     <script>
+        let orginalVacationTimeslot=0;
 
         // 请假类型值改变事件
         function selectTypeEvent(v,e){
+            //切换了假期请假类型，则时间段差值初始化并设置为0
             var fdLeaveType= GetXFormFieldById("fdLeaveType")[0].value;
             //  获取假期额度
             var kmssData1 = new KMSSData();
@@ -43,9 +36,18 @@
 
             var statTypeIndex = parseInt(statType) -1;
             console.info(statTypeIndex)
+            if(statTypeIndex!=1){
+                var gongshiTian2 = parseInt($("[name='extendDataFormInfo.value(fd_3d38f553fdc31c)").val());
+                if (gongshiTian2>0)
+                $("[name='extendDataFormInfo.value(fd_3c929324b4707e)']").val($("[name='extendDataFormInfo.value(fd_3d38f553fdc31c)").val());
+            }else {
+                var gongshiTian = parseInt($("[name='extendDataFormInfo.value(fd_3d38f553fdc31c)").val());
+                var gongshiTian2=gongshiTian+ orginalVacationTimeslot;
+                if (gongshiTian2>0)
+                $("[name='extendDataFormInfo.value(fd_3c929324b4707e)']").val(gongshiTian2);
+            }
             var statTypeRadio = $("[name='extendDataFormInfo.value(fdStatType)']");
             statTypeRadio.eq(statTypeIndex).prop("checked", true);
-            statTypeRadio.eq(statTypeIndex).prop("value", statTypeIndex);
             statTypeRadio.eq(statTypeIndex).click();
             statTypeRadio.click(function() {
                 return false;
@@ -54,8 +56,7 @@
         }
 
         //添加提交校验，如果剩余假期时间小于请假天数那么不允许提交
-        // let origialVacatonDay=0;
-        let orginalVacationTimeslot=0;
+
         Com_Parameter.event["submit"].push(function() {
             debugger
             let canSubmit=true;
@@ -65,7 +66,7 @@
             let fdLeaveType2= GetXFormFieldById("fdLeaveType")[0].value;
 
             $.ajax({
-                url: '${LUI_ContextPath}/sys/time/sys_time_leave_rule/sysTimeLeaveRule.do?method=getVacationParams&fdLeaveType='+fdLeaveType2, // 请求的URL
+                url: '${LUI_ContextPath}/km/review/km_review_main/kmReviewMain.do?method=getVacationParams&fdLeaveType='+fdLeaveType2, // 请求的URL
                 type: 'GET', // 请求类型为GET
                 async:false,
                 success: function(data) {
@@ -128,9 +129,16 @@
 
             // 计算两个日期之间的时间差（以毫秒为单位）
             var timeDiff = Math.abs(d1.getTime() - d2.getTime());
+            if(d2.getTime()-d1.getTime()<0){
+                seajs.use(['lui/dialog'], function (dialog) {
+                    dialog.alert('结束时间小于开始时间，请重新输入结束时间或者开始时间');
+                })
+                return;
+            }
+
 
             // 将时间差转换为天数
-            var diffDays = Math.ceil((timeDiff / (1000 * 3600 * 24))+1).toString();
+            var diffDays = Math.ceil((timeDiff / (1000 * 3600 * 24))+1);
 
             return diffDays;
         }
@@ -150,11 +158,10 @@
                 })
                 return;
             }
-            // origialVacatonDay=parseInt(GetXFormFieldById("fd_3c929324b4707e")[0].value);
             let origialVacatonDay=parseInt(GetXFormFieldById("fd_3d38f553fdc31c")[0].value);
             origialVacatonDay=origialVacatonDay+orginalVacationTimeslot;
             let fdLeaveType3= GetXFormFieldById("fdLeaveType")[0].value;
-            if (fdLeaveType3==5 || fdLeaveType3==6){
+            if (fdLeaveType3==5 || fdLeaveType3==6 || fdLeaveType3==10){
                 let endTime = $("[name='extendDataFormInfo.value(fd_3c8699465e843c)").val();
                 let diffTime = dateDiff(startTime,endTime);
                 origialVacatonDay=diffTime+orginalVacationTimeslot;
@@ -191,17 +198,18 @@
             if (shichangTian>0)
             $("[name='extendDataFormInfo.value(fd_3c929324b4707e)']").val(shichangTian);
 
-        }
 
-        AttachXFormValueChangeEventById("fd_3c86992e4fbb48", timePartChangeEvent);
-        AttachXFormValueChangeEventById("fd_3c86995230882a", timePartChangeEvent);
+
+
+        }
+            AttachXFormValueChangeEventById("fd_3c86992e4fbb48", timePartChangeEvent);
+            AttachXFormValueChangeEventById("fd_3c86995230882a", timePartChangeEvent);
 
         AttachXFormValueChangeEventById("fd_3c86992aed3590", endAndStartTimeChangeEvent);
         AttachXFormValueChangeEventById("fd_3c8699465e843c", endAndStartTimeChangeEvent);
         document.addEventListener("DOMContentLoaded", function() {
             // DOM 已经完全加载和解析，但其他资源可能还没有加载完
-            debugger
-            $("[name='fd_3d38f553fdc31c']").hide();
+            $("[name='extendDataFormInfo.value(fd_3d38f553fdc31c)']").hide()
         });
 
 
@@ -212,6 +220,3 @@
         AttachXFormValueChangeEventById("fdLeaveType", selectTypeEvent);
     </script>
 </xform:editShow>
-
-</body>
-</html>
