@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/JQuery.js"></script>
+</head>
+<body>
+<script>
+    $(document).ready(function() {
+
+
+        const selector = '#_xform_extendDataFormInfo\\.value\\(fd_3c65af562c526c\\)';
+        const parentDiv = $(selector).parent('div');
+
+        // 确保选择器正确并且存在父 div
+        if (parentDiv.length > 0) {
+            parentDiv.after(`
+                    <div>
+
+                        <input type="button" value="历史数据查询" onclick="petitionPopFrame();"/>
+                    </div>
+                `);
+        } else {
+            console.error('选择器未找到或没有父 div 元素');
+        }
+    });
+</script>
+
+
+
+</body>
+</html>

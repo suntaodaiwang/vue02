@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/JQuery.js"></script>
+</head>
+<body>
+<input name="fdHostDeptIds" hidden="hidden" >
+<input name="fdHostDeptNames" hidden="hidden">
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        $("[name='extendDataFormInfo.value(fdMajorDept.id)']").parent('div').after(`<input name="fdHostDeptIds" hidden="hidden" >
+        <input name="fdHostDeptNames" hidden="hidden">`)
+        $("[name='extendDataFormInfo.value(fdMajorDept.id)']").change(function() {
+            debugger
+            var majorDeptIds = $("[name='extendDataFormInfo.value(fdMajorDept.id)']").val();
+            var majorDeptNames = $("[name='extendDataFormInfo.value(fdMajorDept.name)']").val();
+            console.info("majorDeptids",majorDeptIds);
+            console.info("majorDeptNames",majorDeptNames);
+            $("[name='fdHostDeptIds']").val(majorDeptIds);
+            $("[name='fdHostDeptNames']").val(majorDeptNames);
+        });
+    });
+
+</script>
+
+
+
+
+</body>
+</html>
